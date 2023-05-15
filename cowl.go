@@ -39,3 +39,12 @@ func run() {
 type Runnable interface {
 	Run()
 }
+
+func send(r Runnable) {
+	select {
+	case i := <-queue:
+		channels[i] <- r
+	default:
+		go r.Run()
+	}
+}

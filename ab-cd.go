@@ -1,7 +1,6 @@
 package cowl
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -17,18 +16,6 @@ type s[A, B, C, D any] struct {
 func (s *s[A, B, C, D]) Run() {
 	s.c, s.d = s.f(s.a, s.b)
 	s.m.Unlock()
-}
-
-func send(r Runnable) {
-	select {
-	case i := <-queue:
-		channels[i] <- r
-	default:
-		fmt.Println("WOOPS")
-		go func() {
-			r.Run()
-		}()
-	}
 }
 
 func Do[A, B, C, D any](
