@@ -10,9 +10,9 @@ import (
 
 func main() {
 	f := cowl.Do(hardLogic, "test", 1)
-	sl := smallLogic()
+	ll := lightLogic()
 	a, b := f()
-	fmt.Println(a, b, sl)
+	fmt.Println(a, b, ll)
 }
 
 func hardLogic(a string, b int) (string, error) {
@@ -20,7 +20,7 @@ func hardLogic(a string, b int) (string, error) {
 	return a + strconv.Itoa(b), nil
 }
 
-func smallLogic() string {
+func lightLogic() string {
 	time.Sleep(1 * time.Second)
-	return "smallLogic test"
+	return "lightLogic test"
 }
