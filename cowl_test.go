@@ -12,7 +12,7 @@ func TestDoSimple(t *testing.T) {
 		return a + strconv.Itoa(b), nil
 	}
 
-	f := Do(testFunc, "test", 1)
+	f := DoTT(testFunc, "test", 1)
 
 	time.Sleep(2 * time.Millisecond)
 
@@ -28,7 +28,7 @@ func TestDoMustWait(t *testing.T) {
 		return a + strconv.Itoa(b), nil
 	}
 
-	f := Do(testFunc, "test", 1)
+	f := DoTT(testFunc, "test", 1)
 
 	a, b := f()
 	if a != "test1" || b != nil {
@@ -43,7 +43,7 @@ func TestDoMany(t *testing.T) {
 			return a + strconv.Itoa(b), nil
 		}
 
-		f := Do(testFunc, "test", 1)
+		f := DoTT(testFunc, "test", 1)
 
 		a, b := f()
 		if a != "test1" || b != nil {

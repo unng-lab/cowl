@@ -10,7 +10,7 @@ import (
 
 func main() {
 	t := time.Now()
-	f := cowl.Do(hardLogic, "test", 1)
+	f := cowl.DoTT(hardLogic, "test", 1)
 	ll := lightLogic()
 	a, b := f()
 	fmt.Println(a, b, ll, time.Since(t))
