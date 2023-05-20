@@ -1,50 +1,20 @@
+/*
+ * Copyright (c) 2023. UNNG-Lab
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ *  substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ *  INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+ *  A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ *  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ *  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
+ *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package cowl
-
-var channels []chan Runnable
-var queue chan int
-var num int
-
-func init() {
-	n := 5
-	if num > 0 {
-		n = num
-	}
-	queue = make(chan int, n)
-	for i := 0; i < n; i++ {
-		channels = append(channels, make(chan Runnable, 1))
-		queue <- i
-	}
-	go run()
-}
-
-func SetNum(n int) {
-	num = n
-}
-
-func run() {
-	for i := range channels {
-		go func(k int) {
-			for {
-				select {
-				case s := <-channels[k]:
-					s.Run()
-					queue <- k
-				}
-			}
-		}(i)
-	}
-
-}
-
-type Runnable interface {
-	Run()
-}
-
-func send(r Runnable) {
-	select {
-	case i := <-queue:
-		channels[i] <- r
-	default:
-		go r.Run()
-	}
-}

@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2023. UNNG-Lab
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ *  substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ *  INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+ *  A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ *  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ *  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
+ *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package cowl
 
 import (
@@ -6,23 +25,19 @@ import (
 
 // zeroZero
 type zeroZero struct {
-	fn func()
-	m  sync.RWMutex
-}
-
-func (s *zeroZero) Run() {
-	s.fn()
-	s.m.Unlock()
+	m sync.RWMutex
 }
 
 // DoZZ zero in zero return
 func DoZZ(
 	fn func(),
 ) func() {
-	res := zeroZero{}
+	var res zeroZero
 	res.m.Lock()
-	res.fn = fn
-	send(&res)
+	go func() {
+		fn()
+		res.m.Unlock()
+	}()
 	return func() {
 		res.m.RLock()
 	}
@@ -30,81 +45,69 @@ func DoZZ(
 
 // zeroOne
 type zeroOne[A any] struct {
-	fn func() A
-	a  *A
-	m  sync.RWMutex
-}
-
-func (s *zeroOne[A]) Run() {
-	*s.a = s.fn()
-	s.m.Unlock()
+	a A
+	m sync.RWMutex
 }
 
 // DoZO zero in one return
 func DoZO[A any](
 	fn func() A,
 ) func() A {
-	res := zeroOne[A]{a: new(A)}
+	var res zeroOne[A]
 	res.m.Lock()
-	res.fn = fn
-	send(&res)
+	go func() {
+		res.a = fn()
+		res.m.Unlock()
+	}()
 	return func() A {
 		res.m.RLock()
-		return *res.a
+		return res.a
 	}
 }
 
 // zeroTwo
 type zeroTwo[A, B any] struct {
-	fn func() (A, B)
-	a  *A
-	b  *B
-	m  sync.RWMutex
-}
-
-func (s *zeroTwo[A, B]) Run() {
-	*s.a, *s.b = s.fn()
-	s.m.Unlock()
+	a A
+	b B
+	m sync.RWMutex
 }
 
 // DoZT zero in two return
 func DoZT[A, B any](
 	fn func() (A, B),
 ) func() (A, B) {
-	res := zeroTwo[A, B]{a: new(A), b: new(B)}
+	var res zeroTwo[A, B]
 	res.m.Lock()
-	res.fn = fn
-	send(&res)
+	go func() {
+		res.a, res.b = fn()
+		res.m.Unlock()
+	}()
 	return func() (A, B) {
 		res.m.RLock()
-		return *res.a, *res.b
+		return res.a, res.b
 	}
 }
 
 // zeroThree
 type zeroThree[A, B, C any] struct {
-	fn func() (A, B, C)
-	a  *A
-	b  *B
-	c  *C
-	m  sync.RWMutex
-}
-
-func (s *zeroThree[A, B, C]) Run() {
-	*s.a, *s.b, *s.c = s.fn()
-	s.m.Unlock()
+	a A
+	b B
+	c C
+	m sync.RWMutex
 }
 
 // DoZTh zero in three return
 func DoZTh[A, B, C any](
 	fn func() (A, B, C),
 ) func() (A, B, C) {
-	res := zeroThree[A, B, C]{a: new(A), b: new(B), c: new(C)}
+	var res zeroThree[A, B, C]
 	res.m.Lock()
-	res.fn = fn
-	send(&res)
+	go func() {
+		res.a, res.b, res.c = fn()
+		res.m.Unlock()
+	}()
 	return func() (A, B, C) {
 		res.m.RLock()
-		return *res.a, *res.b, *res.c
+		return res.a, res.b, res.c
 	}
 }
