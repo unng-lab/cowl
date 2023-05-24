@@ -17,27 +17,30 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package cowl
+package async
 
 import (
 	"sync"
 )
 
-// twoZero
-type twoZero[A, B any] struct {
+// fiveZero
+type fiveZero struct {
 	m sync.RWMutex
 }
 
-// DoTZ two in zero return
-func DoTZ[A, B any](
-	fn func(A, B),
+// Async5to0 five in zero return
+func Async5to0[A, B, C, D, E any](
+	fn func(A, B, C, D, E),
 	a A,
 	b B,
+	c C,
+	d D,
+	e E,
 ) func() {
-	var res twoZero[A, B]
+	var res fiveZero
 	res.m.Lock()
 	go func() {
-		fn(a, b)
+		fn(a, b, c, d, e)
 		res.m.Unlock()
 	}()
 	return func() {
@@ -45,75 +48,84 @@ func DoTZ[A, B any](
 	}
 }
 
-// twoOne
-type twoOne[C any] struct {
-	c C
+// fiveOne
+type fiveOne[F any] struct {
+	f F
 	m sync.RWMutex
 }
 
-// DoTO two in one return
-func DoTO[A, B, C any](
-	fn func(A, B) C,
+// Async5to1 five in one return
+func Async5to1[A, B, C, D, E, F any](
+	fn func(A, B, C, D, E) F,
 	a A,
 	b B,
-) func() C {
-	var res twoOne[C]
+	c C,
+	d D,
+	e E,
+) func() F {
+	var res fiveOne[F]
 	res.m.Lock()
 	go func() {
-		res.c = fn(a, b)
+		res.f = fn(a, b, c, d, e)
 		res.m.Unlock()
 	}()
-	return func() C {
+	return func() F {
 		res.m.RLock()
-		return res.c
+		return res.f
 	}
 }
 
-type twoTwo[C, D any] struct {
-	c C
-	d D
+type fiveTwo[F, G any] struct {
+	f F
+	g G
 	m sync.RWMutex
 }
 
-// DoTT two in two return
-func DoTT[A, B, C, D any](
-	fn func(A, B) (C, D),
+// Async5to2 five in two return
+func Async5to2[A, B, C, D, E, F, G any](
+	fn func(A, B, C, D, E) (F, G),
 	a A,
 	b B,
-) func() (C, D) {
-	var res twoTwo[C, D]
+	c C,
+	d D,
+	e E,
+) func() (F, G) {
+	var res fiveTwo[F, G]
 	res.m.Lock()
 	go func() {
-		res.c, res.d = fn(a, b)
+		res.f, res.g = fn(a, b, c, d, e)
 		res.m.Unlock()
 	}()
-	return func() (C, D) {
+	return func() (F, G) {
 		res.m.RLock()
-		return res.c, res.d
+		return res.f, res.g
 	}
 }
 
-type twoThree[C, D, E any] struct {
-	c C
-	d D
-	e E
+type fiveThree[F, G, H any] struct {
+	f F
+	g G
+	h H
 	m sync.RWMutex
 }
 
-// DoTTh two in three return
-func DoTTh[A, B, C, D, E any](
-	fn func(A, B) (C, D, E),
+// Async5to3 five in three return
+func Async5to3[A, B, C, D, E, F, G, H any](
+	fn func(A, B, C, D, E) (F, G, H),
 	a A,
 	b B,
-) func() (C, D, E) {
-	var res twoThree[C, D, E]
+	c C,
+	d D,
+	e E,
+) func() (F, G, H) {
+	var res fiveThree[F, G, H]
 	res.m.Lock()
 	go func() {
-		res.c, res.d, res.e = fn(a, b)
+		res.f, res.g, res.h = fn(a, b, c, d, e)
 		res.m.Unlock()
 	}()
-	return func() (C, D, E) {
+	return func() (F, G, H) {
 		res.m.RLock()
-		return res.c, res.d, res.e
+		return res.f, res.g, res.h
 	}
 }

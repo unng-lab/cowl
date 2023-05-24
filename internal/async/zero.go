@@ -17,29 +17,25 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package cowl
+package async
 
 import (
 	"sync"
 )
 
-// fourZero
-type fourZero struct {
+// zeroZero
+type zeroZero struct {
 	m sync.RWMutex
 }
 
-// DoFZ four in zero return
-func DoFZ[A, B, C, D any](
-	fn func(A, B, C, D),
-	a A,
-	b B,
-	c C,
-	d D,
+// Async0to0 zero in zero return
+func Async0to0(
+	fn func(),
 ) func() {
-	var res fourZero
+	var res zeroZero
 	res.m.Lock()
 	go func() {
-		fn(a, b, c, d)
+		fn()
 		res.m.Unlock()
 	}()
 	return func() {
@@ -47,81 +43,71 @@ func DoFZ[A, B, C, D any](
 	}
 }
 
-// fourOne
-type fourOne[E any] struct {
-	e E
+// zeroOne
+type zeroOne[A any] struct {
+	a A
 	m sync.RWMutex
 }
 
-// DoFO four in one return
-func DoFO[A, B, C, D, E any](
-	fn func(A, B, C, D) E,
-	a A,
-	b B,
-	c C,
-	d D,
-) func() E {
-	var res fourOne[E]
+// Async0to1 zero in one return
+func Async0to1[A any](
+	fn func() A,
+) func() A {
+	var res zeroOne[A]
 	res.m.Lock()
 	go func() {
-		res.e = fn(a, b, c, d)
+		res.a = fn()
 		res.m.Unlock()
 	}()
-	return func() E {
+	return func() A {
 		res.m.RLock()
-		return res.e
+		return res.a
 	}
 }
 
-type fourTwo[E, F any] struct {
-	e E
-	f F
+// zeroTwo
+type zeroTwo[A, B any] struct {
+	a A
+	b B
 	m sync.RWMutex
 }
 
-// DoFT four in two return
-func DoFT[A, B, C, D, E, F any](
-	fn func(A, B, C, D) (E, F),
-	a A,
-	b B,
-	c C,
-	d D,
-) func() (E, F) {
-	var res fourTwo[E, F]
+// Async0to2 zero in two return
+func Async0to2[A, B any](
+	fn func() (A, B),
+) func() (A, B) {
+	var res zeroTwo[A, B]
 	res.m.Lock()
 	go func() {
-		res.e, res.f = fn(a, b, c, d)
+		res.a, res.b = fn()
 		res.m.Unlock()
 	}()
-	return func() (E, F) {
+	return func() (A, B) {
 		res.m.RLock()
-		return res.e, res.f
+		return res.a, res.b
 	}
 }
 
-type fourThree[E, F, G any] struct {
-	e E
-	f F
-	g G
+// zeroThree
+type zeroThree[A, B, C any] struct {
+	a A
+	b B
+	c C
 	m sync.RWMutex
 }
 
-// DoFTh four in three return
-func DoFTh[A, B, C, D, E, F, G any](
-	fn func(A, B, C, D) (E, F, G),
-	a A,
-	b B,
-	c C,
-	d D,
-) func() (E, F, G) {
-	var res fourThree[E, F, G]
+// Async0to3 zero in three return
+func Async0to3[A, B, C any](
+	fn func() (A, B, C),
+) func() (A, B, C) {
+	var res zeroThree[A, B, C]
 	res.m.Lock()
 	go func() {
-		res.e, res.f, res.g = fn(a, b, c, d)
+		res.a, res.b, res.c = fn()
 		res.m.Unlock()
 	}()
-	return func() (E, F, G) {
+	return func() (A, B, C) {
 		res.m.RLock()
-		return res.e, res.f, res.g
+		return res.a, res.b, res.c
 	}
 }

@@ -17,77 +17,77 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package cowl
+package async
 
 import (
 	"testing"
 	"time"
 )
 
-func TestDoZZSimple(t *testing.T) {
-	var a string
-	testFunc := func() {
+func TestAsync4to0Simple(t *testing.T) {
+	var z string
+	testFunc := func(a, b, c, d string) {
 		time.Sleep(1 * time.Millisecond)
-		a = "test"
+		z = a + b + c + d
 	}
 
-	f := DoZZ(testFunc)
+	f := Async4to0(testFunc, "a", "b", "c", "d")
 
 	time.Sleep(2 * time.Millisecond)
 
 	f()
-	if a != "test" {
-		t.Error(a)
+	if z != "abcd" {
+		t.Error(z)
 	}
 }
 
-func TestDoZOSimple(t *testing.T) {
-	var a string
-	testFunc := func() string {
+func TestAsync4to1Simple(t *testing.T) {
+	var z string
+	testFunc := func(a, b, c, d string) string {
 		time.Sleep(1 * time.Millisecond)
-		return "test"
+		return a + b + c + d
 	}
 
-	f := DoZO(testFunc)
+	f := Async4to1(testFunc, "a", "b", "c", "d")
 
 	time.Sleep(2 * time.Millisecond)
 
-	a = f()
-	if a != "test" {
-		t.Error(a)
+	z = f()
+	if z != "abcd" {
+		t.Error(z)
 	}
 }
 
-func TestDoZTSimple(t *testing.T) {
-	var a, b string
-	testFunc := func() (string, string) {
+func TestAsync4to2Simple(t *testing.T) {
+	var z, y string
+	testFunc := func(a, b, c, d string) (string, string) {
 		time.Sleep(1 * time.Millisecond)
-		return "test", "test1"
+		return a + b + c + d + "1", a + b + c + d + "2"
 	}
 
-	f := DoZT(testFunc)
+	f := Async4to2(testFunc, "a", "b", "c", "d")
 
 	time.Sleep(2 * time.Millisecond)
 
-	a, b = f()
-	if a != "test" || b != "test1" {
-		t.Error(a, b)
+	z, y = f()
+	if z != "abcd1" || y != "abcd2" {
+		t.Error(z, y)
 	}
 }
 
-func TestDoZThSimple(t *testing.T) {
-	var a, b, c string
-	testFunc := func() (string, string, string) {
+func TestAsync4toFSimple(t *testing.T) {
+	var z, y, x string
+	testFunc := func(a, b, c, d string) (string, string, string) {
 		time.Sleep(1 * time.Millisecond)
-		return "test", "test1", "test2"
+		return a + b + c + d + "1", a + b + c + d + "2", a + b + c + d + "3"
 	}
 
-	f := DoZTh(testFunc)
+	f := Async4to3(testFunc, "a", "b", "c", "d")
 
 	time.Sleep(2 * time.Millisecond)
 
-	a, b, c = f()
-	if a != "test" || b != "test1" || c != "test2" {
-		t.Error(a)
+	z, y, x = f()
+	if z != "abcd1" || y != "abcd2" || x != "abcd3" {
+		t.Error(z, x, y)
 	}
 }

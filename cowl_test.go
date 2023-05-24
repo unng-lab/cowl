@@ -23,6 +23,8 @@ import (
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/unng-lab/cowl/internal/async"
 )
 
 func TestDoSimple(t *testing.T) {
@@ -31,7 +33,7 @@ func TestDoSimple(t *testing.T) {
 		return a + strconv.Itoa(b), nil
 	}
 
-	f := DoTT(testFunc, "test", 1)
+	f := async.DoTT(testFunc, "test", 1)
 
 	time.Sleep(2 * time.Millisecond)
 
@@ -47,7 +49,7 @@ func TestDoMustWait(t *testing.T) {
 		return a + strconv.Itoa(b), nil
 	}
 
-	f := DoTT(testFunc, "test", 1)
+	f := async.DoTT(testFunc, "test", 1)
 
 	a, b := f()
 	if a != "test1" || b != nil {
@@ -62,7 +64,7 @@ func TestDoMany(t *testing.T) {
 			return a + strconv.Itoa(b), nil
 		}
 
-		f := DoTT(testFunc, "test", 1)
+		f := async.DoTT(testFunc, "test", 1)
 
 		a, b := f()
 		if a != "test1" || b != nil {

@@ -32,7 +32,7 @@ import (
 
 func main() {
 	t := time.Now()
-	f := cowl.DoTT(hardLogic, "test", 1)
+	f := cowl.Async2to2(hardLogic, "test", 1)
 	ll := lightLogic()
 	a, b := f()
 	fmt.Println(a, b, ll, time.Since(t))
@@ -56,8 +56,8 @@ As u see normal execution would take 6 seconds and with cowl u can do it in 5 se
 ```shell
 BenchmarkSamberLoAsync
 BenchmarkSamberLoAsync-12     4691236     246.4 ns/op       240       B/op          4 allocs/op
-BenchmarkDoThThTest
-BenchmarkDoThThTest-12        4624257     220.1 ns/op       184       B/op          3 allocs/op
+BenchmarkAsync3to3Test
+BenchmarkAsync3to3Test-12        4624257     220.1 ns/op       184       B/op          3 allocs/op
 ```
 
 NOTE: tested with popular https://github.com/samber/lo Async3

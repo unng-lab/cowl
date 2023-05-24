@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/samber/lo"
+	"github.com/unng-lab/cowl/internal/async"
 )
 
 func BenchmarkSamberLoAsync(b *testing.B) {
@@ -48,7 +49,7 @@ func BenchmarkDoThThTest(b *testing.B) {
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			res := DoThTh(testFunc, aa, bb, cc)
+			res := async.Async3to3(testFunc, aa, bb, cc)
 			x, y, z := res()
 			_ = x + y + z
 		}

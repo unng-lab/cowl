@@ -17,77 +17,77 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package cowl
+package async
 
 import (
 	"testing"
 	"time"
 )
 
-func TestDoThZSimple(t *testing.T) {
-	var z string
-	testFunc := func(a, b, c string) {
+func TestAsync0to0Simple(t *testing.T) {
+	var a string
+	testFunc := func() {
 		time.Sleep(1 * time.Millisecond)
-		z = a + b + c
+		a = "test"
 	}
 
-	f := DoThZ(testFunc, "a", "b", "c")
+	f := Async0to0(testFunc)
 
 	time.Sleep(2 * time.Millisecond)
 
 	f()
-	if z != "abc" {
-		t.Error(z)
+	if a != "test" {
+		t.Error(a)
 	}
 }
 
-func TestDoThOSimple(t *testing.T) {
-	var z string
-	testFunc := func(a, b, c string) string {
+func TestAsync0to1Simple(t *testing.T) {
+	var a string
+	testFunc := func() string {
 		time.Sleep(1 * time.Millisecond)
-		return a + b + c
+		return "test"
 	}
 
-	f := DoThO(testFunc, "a", "b", "c")
+	f := Async0to1(testFunc)
 
 	time.Sleep(2 * time.Millisecond)
 
-	z = f()
-	if z != "abc" {
-		t.Error(z)
+	a = f()
+	if a != "test" {
+		t.Error(a)
 	}
 }
 
-func TestDoThTSimple(t *testing.T) {
-	var z, y string
-	testFunc := func(a, b, c string) (string, string) {
+func TestAsync0to2Simple(t *testing.T) {
+	var a, b string
+	testFunc := func() (string, string) {
 		time.Sleep(1 * time.Millisecond)
-		return a + b + c + "1", a + b + c + "2"
+		return "test", "test1"
 	}
 
-	f := DoThT(testFunc, "a", "b", "c")
+	f := Async0to2(testFunc)
 
 	time.Sleep(2 * time.Millisecond)
 
-	z, y = f()
-	if z != "abc1" || y != "abc2" {
-		t.Error(z, y)
+	a, b = f()
+	if a != "test" || b != "test1" {
+		t.Error(a, b)
 	}
 }
 
-func TestDoThThSimple(t *testing.T) {
-	var z, y, x string
-	testFunc := func(a, b, c string) (string, string, string) {
+func TestAsync0to3Simple(t *testing.T) {
+	var a, b, c string
+	testFunc := func() (string, string, string) {
 		time.Sleep(1 * time.Millisecond)
-		return a + b + c + "1", a + b + c + "2", a + b + c + "3"
+		return "test", "test1", "test2"
 	}
 
-	f := DoThTh(testFunc, "a", "b", "c")
+	f := Async0to3(testFunc)
 
 	time.Sleep(2 * time.Millisecond)
 
-	z, y, x = f()
-	if z != "abc1" || y != "abc2" || x != "abc3" {
-		t.Error(z, x, y)
+	a, b, c = f()
+	if a != "test" || b != "test1" || c != "test2" {
+		t.Error(a)
 	}
 }

@@ -17,28 +17,25 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package cowl
+package async
 
 import (
 	"sync"
 )
 
-// threeZero
-type threeZero[A, B, C any] struct {
+type oneZero struct {
 	m sync.RWMutex
 }
 
-// DoThZ three in zero return
-func DoThZ[A, B, C any](
-	fn func(A, B, C),
+// Async1to0 one in zero return
+func Async1to0[A any](
+	fn func(A),
 	a A,
-	b B,
-	c C,
 ) func() {
-	var res threeZero[A, B, C]
+	var res oneZero
 	res.m.Lock()
 	go func() {
-		fn(a, b, c)
+		fn(a)
 		res.m.Unlock()
 	}()
 	return func() {
@@ -46,80 +43,74 @@ func DoThZ[A, B, C any](
 	}
 }
 
-// threeOne
-type threeOne[B, C, D any] struct {
+// oneOne
+type oneOne[B any] struct {
+	b B
+	m sync.RWMutex
+}
+
+// Async1to1 one in one return
+func Async1to1[A, B any](
+	fn func(A) B,
+	a A,
+) func() B {
+	var res oneOne[B]
+	res.m.Lock()
+	go func() {
+		res.b = fn(a)
+		res.m.Unlock()
+	}()
+	return func() B {
+		res.m.RLock()
+		return res.b
+	}
+}
+
+// oneTwo
+type oneTwo[B, C any] struct {
+	b B
+	c C
+	m sync.RWMutex
+}
+
+// Async1to2 one in two return
+func Async1to2[A, B, C any](
+	fn func(A) (B, C),
+	a A,
+) func() (B, C) {
+	var res oneTwo[B, C]
+	res.m.Lock()
+	go func() {
+		res.b, res.c = fn(a)
+		res.m.Unlock()
+	}()
+	return func() (B, C) {
+		res.m.RLock()
+		return res.b, res.c
+	}
+}
+
+// oneThree
+type oneThree[B, C, D any] struct {
 	b B
 	c C
 	d D
 	m sync.RWMutex
 }
 
-// DoThO three in one return
-func DoThO[A, B, C, D any](
-	fn func(A, B, C) D,
+// Async1to3 one in three return
+func Async1to3[A, B, C, D any](
+	fn func(A) (B, C, D),
 	a A,
-	b B,
-	c C,
-) func() D {
-	var res threeOne[B, C, D]
+) func() (B, C, D) {
+	var res oneThree[B, C, D]
 	res.m.Lock()
 	go func() {
-		res.d = fn(a, b, c)
+		res.b, res.c, res.d = fn(a)
 		res.m.Unlock()
 	}()
-	return func() D {
+	return func() (B, C, D) {
 		res.m.RLock()
-		return res.d
-	}
-}
-
-type threeTwo[D, E any] struct {
-	d D
-	e E
-	m sync.RWMutex
-}
-
-// DoThT three in two return
-func DoThT[A, B, C, D, E any](
-	fn func(A, B, C) (D, E),
-	a A,
-	b B,
-	c C,
-) func() (D, E) {
-	var res threeTwo[D, E]
-	res.m.Lock()
-	go func() {
-		res.d, res.e = fn(a, b, c)
-		res.m.Unlock()
-	}()
-	return func() (D, E) {
-		res.m.RLock()
-		return res.d, res.e
-	}
-}
-
-type threeThree[D, E, F any] struct {
-	d D
-	e E
-	f F
-	m sync.RWMutex
-}
-
-// DoThTh three in three return
-func DoThTh[A, B, C, D, E, F any](
-	fn func(A, B, C) (D, E, F),
-	a A,
-	b B,
-	c C,
-) func() (D, E, F) {
-	var res threeThree[D, E, F]
-	res.m.Lock()
-	go func() {
-		res.d, res.e, res.f = fn(a, b, c)
-		res.m.Unlock()
-	}()
-	return func() (D, E, F) {
-		res.m.RLock()
-		return res.d, res.e, res.f
+		return res.b, res.c, res.d
 	}
 }

@@ -17,77 +17,77 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package cowl
+package async
 
 import (
 	"testing"
 	"time"
 )
 
-func TestDoOZSimple(t *testing.T) {
+func TestAsync5to0Simple(t *testing.T) {
 	var z string
-	testFunc := func(a string) {
+	testFunc := func(a, b, c, d, e string) {
 		time.Sleep(1 * time.Millisecond)
-		z = a
+		z = a + b + c + d + e
 	}
 
-	f := DoOZ(testFunc, "test")
+	f := Async5to0(testFunc, "a", "b", "c", "d", "e")
 
 	time.Sleep(2 * time.Millisecond)
 
 	f()
-	if z != "test" {
+	if z != "abcde" {
 		t.Error(z)
 	}
 }
 
-func TestDoOOSimple(t *testing.T) {
+func TestAsync5to1Simple(t *testing.T) {
 	var z string
-	testFunc := func(a string) string {
+	testFunc := func(a, b, c, d, e string) string {
 		time.Sleep(1 * time.Millisecond)
-		return a
+		return a + b + c + d + e
 	}
 
-	f := DoOO(testFunc, "test")
+	f := Async5to1(testFunc, "a", "b", "c", "d", "e")
 
 	time.Sleep(2 * time.Millisecond)
 
 	z = f()
-	if z != "test" {
+	if z != "abcde" {
 		t.Error(z)
 	}
 }
 
-func TestDoOTSimple(t *testing.T) {
+func TestAsync5to2Simple(t *testing.T) {
 	var z, y string
-	testFunc := func(a string) (string, string) {
+	testFunc := func(a, b, c, d, e string) (string, string) {
 		time.Sleep(1 * time.Millisecond)
-		return a + "1", a + "2"
+		return a + b + c + d + e + "1", a + b + c + d + e + "2"
 	}
 
-	f := DoOT(testFunc, "test")
+	f := Async5to2(testFunc, "a", "b", "c", "d", "e")
 
 	time.Sleep(2 * time.Millisecond)
 
 	z, y = f()
-	if z != "test1" || y != "test2" {
+	if z != "abcde1" || y != "abcde2" {
 		t.Error(z, y)
 	}
 }
 
-func TestDoOThSimple(t *testing.T) {
+func TestAsync5toFSimple(t *testing.T) {
 	var z, y, x string
-	testFunc := func(a string) (string, string, string) {
+	testFunc := func(a, b, c, d, e string) (string, string, string) {
 		time.Sleep(1 * time.Millisecond)
-		return a + "1", a + "2", a + "3"
+		return a + b + c + d + e + "1", a + b + c + d + e + "2", a + b + c + d + e + "3"
 	}
 
-	f := DoOTh(testFunc, "test")
+	f := Async5to3(testFunc, "a", "b", "c", "d", "e")
 
 	time.Sleep(2 * time.Millisecond)
 
 	z, y, x = f()
-	if z != "test1" || y != "test2" || x != "test3" {
+	if z != "abcde1" || y != "abcde2" || x != "abcde3" {
 		t.Error(z, x, y)
 	}
 }

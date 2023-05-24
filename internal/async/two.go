@@ -17,25 +17,27 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package cowl
+package async
 
 import (
 	"sync"
 )
 
-// zeroZero
-type zeroZero struct {
+// twoZero
+type twoZero[A, B any] struct {
 	m sync.RWMutex
 }
 
-// DoZZ zero in zero return
-func DoZZ(
-	fn func(),
+// Async2to0 two in zero return
+func Async2to0[A, B any](
+	fn func(A, B),
+	a A,
+	b B,
 ) func() {
-	var res zeroZero
+	var res twoZero[A, B]
 	res.m.Lock()
 	go func() {
-		fn()
+		fn(a, b)
 		res.m.Unlock()
 	}()
 	return func() {
@@ -43,71 +45,75 @@ func DoZZ(
 	}
 }
 
-// zeroOne
-type zeroOne[A any] struct {
-	a A
-	m sync.RWMutex
-}
-
-// DoZO zero in one return
-func DoZO[A any](
-	fn func() A,
-) func() A {
-	var res zeroOne[A]
-	res.m.Lock()
-	go func() {
-		res.a = fn()
-		res.m.Unlock()
-	}()
-	return func() A {
-		res.m.RLock()
-		return res.a
-	}
-}
-
-// zeroTwo
-type zeroTwo[A, B any] struct {
-	a A
-	b B
-	m sync.RWMutex
-}
-
-// DoZT zero in two return
-func DoZT[A, B any](
-	fn func() (A, B),
-) func() (A, B) {
-	var res zeroTwo[A, B]
-	res.m.Lock()
-	go func() {
-		res.a, res.b = fn()
-		res.m.Unlock()
-	}()
-	return func() (A, B) {
-		res.m.RLock()
-		return res.a, res.b
-	}
-}
-
-// zeroThree
-type zeroThree[A, B, C any] struct {
-	a A
-	b B
+// twoOne
+type twoOne[C any] struct {
 	c C
 	m sync.RWMutex
 }
 
-// DoZTh zero in three return
-func DoZTh[A, B, C any](
-	fn func() (A, B, C),
-) func() (A, B, C) {
-	var res zeroThree[A, B, C]
+// Async2to1 two in one return
+func Async2to1[A, B, C any](
+	fn func(A, B) C,
+	a A,
+	b B,
+) func() C {
+	var res twoOne[C]
 	res.m.Lock()
 	go func() {
-		res.a, res.b, res.c = fn()
+		res.c = fn(a, b)
 		res.m.Unlock()
 	}()
-	return func() (A, B, C) {
+	return func() C {
 		res.m.RLock()
-		return res.a, res.b, res.c
+		return res.c
+	}
+}
+
+type twoTwo[C, D any] struct {
+	c C
+	d D
+	m sync.RWMutex
+}
+
+// Async2to2 two in two return
+func Async2to2[A, B, C, D any](
+	fn func(A, B) (C, D),
+	a A,
+	b B,
+) func() (C, D) {
+	var res twoTwo[C, D]
+	res.m.Lock()
+	go func() {
+		res.c, res.d = fn(a, b)
+		res.m.Unlock()
+	}()
+	return func() (C, D) {
+		res.m.RLock()
+		return res.c, res.d
+	}
+}
+
+type twoThree[C, D, E any] struct {
+	c C
+	d D
+	e E
+	m sync.RWMutex
+}
+
+// Async2to3 two in three return
+func Async2to3[A, B, C, D, E any](
+	fn func(A, B) (C, D, E),
+	a A,
+	b B,
+) func() (C, D, E) {
+	var res twoThree[C, D, E]
+	res.m.Lock()
+	go func() {
+		res.c, res.d, res.e = fn(a, b)
+		res.m.Unlock()
+	}()
+	return func() (C, D, E) {
+		res.m.RLock()
+		return res.c, res.d, res.e
 	}
 }

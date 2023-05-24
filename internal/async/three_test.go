@@ -17,77 +17,77 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package cowl
+package async
 
 import (
 	"testing"
 	"time"
 )
 
-func TestDoFiZSimple(t *testing.T) {
+func TestAsync3to0Simple(t *testing.T) {
 	var z string
-	testFunc := func(a, b, c, d, e string) {
+	testFunc := func(a, b, c string) {
 		time.Sleep(1 * time.Millisecond)
-		z = a + b + c + d + e
+		z = a + b + c
 	}
 
-	f := DoFiZ(testFunc, "a", "b", "c", "d", "e")
+	f := Async3to0(testFunc, "a", "b", "c")
 
 	time.Sleep(2 * time.Millisecond)
 
 	f()
-	if z != "abcde" {
+	if z != "abc" {
 		t.Error(z)
 	}
 }
 
-func TestDoFiOSimple(t *testing.T) {
+func TestAsync3to1Simple(t *testing.T) {
 	var z string
-	testFunc := func(a, b, c, d, e string) string {
+	testFunc := func(a, b, c string) string {
 		time.Sleep(1 * time.Millisecond)
-		return a + b + c + d + e
+		return a + b + c
 	}
 
-	f := DoFiO(testFunc, "a", "b", "c", "d", "e")
+	f := Async3to1(testFunc, "a", "b", "c")
 
 	time.Sleep(2 * time.Millisecond)
 
 	z = f()
-	if z != "abcde" {
+	if z != "abc" {
 		t.Error(z)
 	}
 }
 
-func TestDoFiTSimple(t *testing.T) {
+func TestAsync3to2Simple(t *testing.T) {
 	var z, y string
-	testFunc := func(a, b, c, d, e string) (string, string) {
+	testFunc := func(a, b, c string) (string, string) {
 		time.Sleep(1 * time.Millisecond)
-		return a + b + c + d + e + "1", a + b + c + d + e + "2"
+		return a + b + c + "1", a + b + c + "2"
 	}
 
-	f := DoFiT(testFunc, "a", "b", "c", "d", "e")
+	f := Async3to2(testFunc, "a", "b", "c")
 
 	time.Sleep(2 * time.Millisecond)
 
 	z, y = f()
-	if z != "abcde1" || y != "abcde2" {
+	if z != "abc1" || y != "abc2" {
 		t.Error(z, y)
 	}
 }
 
-func TestDoFiFSimple(t *testing.T) {
+func TestAsync3to3Simple(t *testing.T) {
 	var z, y, x string
-	testFunc := func(a, b, c, d, e string) (string, string, string) {
+	testFunc := func(a, b, c string) (string, string, string) {
 		time.Sleep(1 * time.Millisecond)
-		return a + b + c + d + e + "1", a + b + c + d + e + "2", a + b + c + d + e + "3"
+		return a + b + c + "1", a + b + c + "2", a + b + c + "3"
 	}
 
-	f := DoFiTh(testFunc, "a", "b", "c", "d", "e")
+	f := Async3to3(testFunc, "a", "b", "c")
 
 	time.Sleep(2 * time.Millisecond)
 
 	z, y, x = f()
-	if z != "abcde1" || y != "abcde2" || x != "abcde3" {
+	if z != "abc1" || y != "abc2" || x != "abc3" {
 		t.Error(z, x, y)
 	}
 }

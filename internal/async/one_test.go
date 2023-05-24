@@ -17,77 +17,77 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package cowl
+package async
 
 import (
 	"testing"
 	"time"
 )
 
-func TestDoTZSimple(t *testing.T) {
+func TestAsync1to0Simple(t *testing.T) {
 	var z string
-	testFunc := func(a, b string) {
+	testFunc := func(a string) {
 		time.Sleep(1 * time.Millisecond)
-		z = a + " " + b
+		z = a
 	}
 
-	f := DoTZ(testFunc, "a-test", "b-test")
+	f := Async1to0(testFunc, "test")
 
 	time.Sleep(2 * time.Millisecond)
 
 	f()
-	if z != "a-test b-test" {
+	if z != "test" {
 		t.Error(z)
 	}
 }
 
-func TestDoTOSimple(t *testing.T) {
+func TestAsync1to1Simple(t *testing.T) {
 	var z string
-	testFunc := func(a, b string) string {
+	testFunc := func(a string) string {
 		time.Sleep(1 * time.Millisecond)
-		return a + b
+		return a
 	}
 
-	f := DoTO(testFunc, "a", "b")
+	f := Async1to1(testFunc, "test")
 
 	time.Sleep(2 * time.Millisecond)
 
 	z = f()
-	if z != "ab" {
+	if z != "test" {
 		t.Error(z)
 	}
 }
 
-func TestDoTTSimple(t *testing.T) {
+func TestAsync1to2Simple(t *testing.T) {
 	var z, y string
-	testFunc := func(a, b string) (string, string) {
+	testFunc := func(a string) (string, string) {
 		time.Sleep(1 * time.Millisecond)
-		return a + " " + b + "1", a + " " + b + "2"
+		return a + "1", a + "2"
 	}
 
-	f := DoTT(testFunc, "a-test", "b-test")
+	f := Async1to2(testFunc, "test")
 
 	time.Sleep(2 * time.Millisecond)
 
 	z, y = f()
-	if z != "a-test b-test1" || y != "a-test b-test2" {
+	if z != "test1" || y != "test2" {
 		t.Error(z, y)
 	}
 }
 
-func TestDoTThSimple(t *testing.T) {
+func TestAsync1to3Simple(t *testing.T) {
 	var z, y, x string
-	testFunc := func(a, b string) (string, string, string) {
+	testFunc := func(a string) (string, string, string) {
 		time.Sleep(1 * time.Millisecond)
-		return a + " " + b + "1", a + " " + b + "2", a + " " + b + "3"
+		return a + "1", a + "2", a + "3"
 	}
 
-	f := DoTTh(testFunc, "a-test", "b-test")
+	f := Async1to3(testFunc, "test")
 
 	time.Sleep(2 * time.Millisecond)
 
 	z, y, x = f()
-	if z != "a-test b-test1" || y != "a-test b-test2" || x != "a-test b-test3" {
+	if z != "test1" || y != "test2" || x != "test3" {
 		t.Error(z, x, y)
 	}
 }

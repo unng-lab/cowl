@@ -17,30 +17,29 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package cowl
+package async
 
 import (
 	"sync"
 )
 
-// fiveZero
-type fiveZero struct {
+// fourZero
+type fourZero struct {
 	m sync.RWMutex
 }
 
-// DoFiZ five in zero return
-func DoFiZ[A, B, C, D, E any](
-	fn func(A, B, C, D, E),
+// Async4to0 four in zero return
+func Async4to0[A, B, C, D any](
+	fn func(A, B, C, D),
 	a A,
 	b B,
 	c C,
 	d D,
-	e E,
 ) func() {
-	var res fiveZero
+	var res fourZero
 	res.m.Lock()
 	go func() {
-		fn(a, b, c, d, e)
+		fn(a, b, c, d)
 		res.m.Unlock()
 	}()
 	return func() {
@@ -48,84 +47,81 @@ func DoFiZ[A, B, C, D, E any](
 	}
 }
 
-// fiveOne
-type fiveOne[F any] struct {
-	f F
+// fourOne
+type fourOne[E any] struct {
+	e E
 	m sync.RWMutex
 }
 
-// DoFiO five in one return
-func DoFiO[A, B, C, D, E, F any](
-	fn func(A, B, C, D, E) F,
+// Async4to1 four in one return
+func Async4to1[A, B, C, D, E any](
+	fn func(A, B, C, D) E,
 	a A,
 	b B,
 	c C,
 	d D,
-	e E,
-) func() F {
-	var res fiveOne[F]
+) func() E {
+	var res fourOne[E]
 	res.m.Lock()
 	go func() {
-		res.f = fn(a, b, c, d, e)
+		res.e = fn(a, b, c, d)
 		res.m.Unlock()
 	}()
-	return func() F {
+	return func() E {
 		res.m.RLock()
-		return res.f
+		return res.e
 	}
 }
 
-type fiveTwo[F, G any] struct {
+type fourTwo[E, F any] struct {
+	e E
+	f F
+	m sync.RWMutex
+}
+
+// Async4to2 four in two return
+func Async4to2[A, B, C, D, E, F any](
+	fn func(A, B, C, D) (E, F),
+	a A,
+	b B,
+	c C,
+	d D,
+) func() (E, F) {
+	var res fourTwo[E, F]
+	res.m.Lock()
+	go func() {
+		res.e, res.f = fn(a, b, c, d)
+		res.m.Unlock()
+	}()
+	return func() (E, F) {
+		res.m.RLock()
+		return res.e, res.f
+	}
+}
+
+type fourThree[E, F, G any] struct {
+	e E
 	f F
 	g G
 	m sync.RWMutex
 }
 
-// DoFiT five in two return
-func DoFiT[A, B, C, D, E, F, G any](
-	fn func(A, B, C, D, E) (F, G),
+// Async4to3 four in three return
+func Async4to3[A, B, C, D, E, F, G any](
+	fn func(A, B, C, D) (E, F, G),
 	a A,
 	b B,
 	c C,
 	d D,
-	e E,
-) func() (F, G) {
-	var res fiveTwo[F, G]
+) func() (E, F, G) {
+	var res fourThree[E, F, G]
 	res.m.Lock()
 	go func() {
-		res.f, res.g = fn(a, b, c, d, e)
+		res.e, res.f, res.g = fn(a, b, c, d)
 		res.m.Unlock()
 	}()
-	return func() (F, G) {
+	return func() (E, F, G) {
 		res.m.RLock()
-		return res.f, res.g
-	}
-}
-
-type fiveThree[F, G, H any] struct {
-	f F
-	g G
-	h H
-	m sync.RWMutex
-}
-
-// DoFiTh five in three return
-func DoFiTh[A, B, C, D, E, F, G, H any](
-	fn func(A, B, C, D, E) (F, G, H),
-	a A,
-	b B,
-	c C,
-	d D,
-	e E,
-) func() (F, G, H) {
-	var res fiveThree[F, G, H]
-	res.m.Lock()
-	go func() {
-		res.f, res.g, res.h = fn(a, b, c, d, e)
-		res.m.Unlock()
-	}()
-	return func() (F, G, H) {
-		res.m.RLock()
-		return res.f, res.g, res.h
+		return res.e, res.f, res.g
 	}
 }
