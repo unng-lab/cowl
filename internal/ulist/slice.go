@@ -17,4 +17,55 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package slice
+package ulist
+
+import (
+	"errors"
+)
+
+var (
+	ErrNotExist       = errors.New("not exist")
+	ErrAlreadyDeleted = errors.New("already deleted")
+)
+
+type Piece[T any] struct {
+	Entity  T
+	deleted bool
+}
+
+type List[T any] struct {
+	Pieces []Piece[T]
+	dList  []int
+}
+
+func New[T any](piece T, cap int) List[T] {
+	res := List[T]{
+		Pieces: make([]Piece[T], 1, cap),
+		dList:  make([]int, 0),
+	}
+	res.Pieces[0] = Piece[T]{Entity: piece}
+	return res
+}
+
+func (l *List[T]) Add(piece T) int {
+	if c := len(l.dList); c > 0 {
+		key := l.dList[c-1]
+		l.dList = l.dList[:c-1]
+		return key
+	} else {
+		l.Pieces = append(l.Pieces, Piece[T]{Entity: piece})
+		return len(l.Pieces) - 1
+	}
+}
+
+func (l *List[T]) Remove(pieceKey int) error {
+	if pieceKey < 0 || pieceKey > len(l.Pieces)-1 {
+		return ErrNotExist
+	}
+	if l.Pieces[pieceKey].deleted {
+		return ErrAlreadyDeleted
+	}
+	l.Pieces[pieceKey].deleted = true
+	l.dList = append(l.dList, pieceKey)
+	return nil
+}
