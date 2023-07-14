@@ -29,7 +29,8 @@ var (
 )
 
 type Store[T comparable, K any] struct {
-	next chan T
+	keys []T
+	next int
 	list map[T]*K
 	size int
 	m    sync.RWMutex
@@ -40,7 +41,8 @@ func NewStore[T comparable, K any](_ T, _ K, size int) *Store[T, K] {
 		panic("size cant be less than 1")
 	}
 	return &Store[T, K]{
-		next: make(chan T, size),
+		next: 0,
+		keys: make([]T, size),
 		list: make(map[T]*K, size),
 		size: size,
 	}
@@ -58,13 +60,12 @@ func (s *Store[T, K]) Get(key T) (*K, error) {
 func (s *Store[T, K]) Put(key T, value K) {
 	s.m.Lock()
 	defer s.m.Unlock()
-	if len(s.next) == s.size {
-		delete(s.list, <-s.next)
-		s.list[key] = &value
-		s.next <- key
-		return
-	}
+	delete(s.list, s.keys[s.next])
 	s.list[key] = &value
-	s.next <- key
+	s.keys[s.next] = key
+	s.next++
+	if s.next == s.size {
+		s.next = 0
+	}
 	return
 }

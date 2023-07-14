@@ -67,7 +67,7 @@ func TestFiFo(t *testing.T) {
 		t.Error(st)
 	}
 
-	if len(st.next) != 3 {
+	if st.next != 1 {
 		t.Error(st)
 	}
 
