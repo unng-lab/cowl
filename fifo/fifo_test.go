@@ -20,51 +20,59 @@
 package fifo
 
 import (
-	"errors"
-	"sync"
+	"testing"
 )
 
-var (
-	ErrKeyNotFound = errors.New("key not found")
-)
-
-type Store[T comparable, K any] struct {
-	next chan T
-	list map[T]*K
-	size int
-	m    sync.RWMutex
-}
-
-func NewStore[T comparable, K any](_ T, _ K, size int) *Store[T, K] {
-	if size < 1 {
-		panic("size cant be less than 1")
+func TestGetPut(t *testing.T) {
+	st := NewStore("", "", 10)
+	st.Put("key1", "value1")
+	v, err := st.Get("key1")
+	if err != nil {
+		t.Error(st)
 	}
-	return &Store[T, K]{
-		next: make(chan T, size),
-		list: make(map[T]*K, size),
-		size: size,
+	if v == nil || *v != "value1" {
+		t.Error(st)
 	}
 }
 
-func (s *Store[T, K]) Get(key T) (*K, error) {
-	s.m.RLock()
-	defer s.m.RUnlock()
-	if v, ok := s.list[key]; ok {
-		return v, nil
+func TestFiFo(t *testing.T) {
+	st := NewStore("", "", 3)
+	st.Put("key1", "value1")
+	st.Put("key2", "value2")
+	st.Put("key3", "value3")
+	st.Put("key4", "value4")
+	_, err := st.Get("key1")
+	if err == nil {
+		t.Error(st)
 	}
-	return nil, ErrKeyNotFound
-}
+	v2, err := st.Get("key2")
+	if err != nil {
+		t.Error(st)
+	}
+	v3, err := st.Get("key3")
+	if err != nil {
+		t.Error(st)
+	}
+	v4, err := st.Get("key4")
+	if err != nil {
+		t.Error(st)
+	}
+	if v2 == nil || *v2 != "value2" {
+		t.Error(st)
+	}
+	if v3 == nil || *v3 != "value3" {
+		t.Error(st)
+	}
+	if v4 == nil || *v4 != "value4" {
+		t.Error(st)
+	}
 
-func (s *Store[T, K]) Put(key T, value K) {
-	s.m.Lock()
-	defer s.m.Unlock()
-	if len(s.next) == s.size {
-		delete(s.list, <-s.next)
-		s.list[key] = &value
-		s.next <- key
-		return
+	if len(st.next) != 3 {
+		t.Error(st)
 	}
-	s.list[key] = &value
-	s.next <- key
-	return
+
+	if len(st.list) != 3 {
+		t.Error(st)
+	}
+
 }
