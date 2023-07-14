@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	"github.com/samber/lo"
-	"github.com/unng-lab/cowl/internal/async"
+	"github.com/unng-lab/cowl/async"
 )
 
 func BenchmarkSamberLoAsync(b *testing.B) {

@@ -17,7 +17,7 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package ulist
+package mslice
 
 import (
 	"errors"
@@ -29,21 +29,20 @@ var (
 )
 
 type Piece[T any] struct {
-	Entity  T
+	entity  T
 	deleted bool
 }
 
 type List[T any] struct {
-	Pieces []Piece[T]
+	pieces []Piece[T]
 	dList  []int
 }
 
-func New[T any](piece T, cap int) List[T] {
+func New[T any](_ T, cap int) List[T] {
 	res := List[T]{
-		Pieces: make([]Piece[T], 1, cap),
+		pieces: make([]Piece[T], 0, cap),
 		dList:  make([]int, 0),
 	}
-	res.Pieces[0] = Piece[T]{Entity: piece}
 	return res
 }
 
@@ -53,19 +52,37 @@ func (l *List[T]) Add(piece T) int {
 		l.dList = l.dList[:c-1]
 		return key
 	} else {
-		l.Pieces = append(l.Pieces, Piece[T]{Entity: piece})
-		return len(l.Pieces) - 1
+		l.pieces = append(l.pieces, Piece[T]{entity: piece})
+		return len(l.pieces) - 1
 	}
 }
 
 func (l *List[T]) Remove(pieceKey int) error {
-	if pieceKey < 0 || pieceKey > len(l.Pieces)-1 {
+	if pieceKey < 0 || pieceKey > len(l.pieces)-1 {
 		return ErrNotExist
 	}
-	if l.Pieces[pieceKey].deleted {
+	if l.pieces[pieceKey].deleted {
 		return ErrAlreadyDeleted
 	}
-	l.Pieces[pieceKey].deleted = true
+	l.pieces[pieceKey].deleted = true
 	l.dList = append(l.dList, pieceKey)
 	return nil
+}
+
+func (l *List[T]) Range(f func(key int, value T) bool) {
+	for k := range l.pieces {
+		f(k, l.pieces[k].entity)
+	}
+}
+
+func (l *List[T]) Get(pieceKey int) (*T, error) {
+	if pieceKey < 0 || pieceKey > len(l.pieces)-1 {
+		return nil, ErrNotExist
+	}
+
+	if l.pieces[pieceKey].deleted {
+		return nil, ErrAlreadyDeleted
+	}
+
+	return &l.pieces[pieceKey].entity, nil
 }

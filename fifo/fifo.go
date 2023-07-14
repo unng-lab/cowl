@@ -17,38 +17,53 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package ulist
+package fifo
 
 import (
-	"testing"
+	"errors"
+	"sync"
 )
 
-type TestStruct struct {
-	id   int
-	name string
+var (
+	ErrKeyNotFound = errors.New("key not found")
+)
+
+type Store[T comparable, K any] struct {
+	next chan T
+	list map[T]K
+	size int
+	m    sync.RWMutex
 }
 
-func (t *TestStruct) GetData() *TestStruct {
-	return t
+func NewStore[T comparable, K any](_ T, _ K, size int) *Store[T, K] {
+	if size < 1 {
+		panic("size cant be less than 1")
+	}
+	return &Store[T, K]{
+		next: make(chan T, size),
+		list: make(map[T]K, size),
+		size: size,
+	}
 }
 
-func TestUListAdd(t *testing.T) {
-	tt := TestStruct{
-		id:   1,
-		name: "asd",
+func (s *Store[T, K]) Get(key T) (*K, error) {
+	s.m.RLock()
+	defer s.m.RUnlock()
+	if v, ok := s.list[key]; ok {
+		return &v, nil
 	}
-	list := New(tt, 10)
-	key := list.Add(tt)
+	return nil, ErrKeyNotFound
+}
 
-	if tt.id != list.Pieces[key].Entity.id || tt.name != list.Pieces[key].Entity.name {
-		t.Error(tt)
+func (s *Store[T, K]) Put(key T, value K) {
+	s.m.Lock()
+	defer s.m.Unlock()
+	if len(s.next) == s.size {
+		delete(s.list, <-s.next)
+		s.list[key] = value
+		s.next <- key
+		return
 	}
-
-	if cap(list.Pieces) != 10 {
-		t.Error(list)
-	}
-
-	if cap(list.Pieces) != 10 {
-		t.Error(list)
-	}
+	s.list[key] = value
+	return
 }

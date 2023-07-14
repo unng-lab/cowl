@@ -24,12 +24,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/unng-lab/cowl"
+	"github.com/unng-lab/cowl/async"
 )
 
 func main() {
 	t := time.Now()
-	f := cowl.Async2to2(hardLogic, "test", 1)
+	f := async.Async2to2(hardLogic, "test", 1)
 	ll := lightLogic()
 	a, b := f()
 	fmt.Println(a, b, ll, time.Since(t))
