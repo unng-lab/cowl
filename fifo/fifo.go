@@ -30,7 +30,7 @@ var (
 
 type Store[T comparable, K any] struct {
 	next chan T
-	list map[T]K
+	list map[T]*K
 	size int
 	m    sync.RWMutex
 }
@@ -41,7 +41,7 @@ func NewStore[T comparable, K any](_ T, _ K, size int) *Store[T, K] {
 	}
 	return &Store[T, K]{
 		next: make(chan T, size),
-		list: make(map[T]K, size),
+		list: make(map[T]*K, size),
 		size: size,
 	}
 }
@@ -50,7 +50,7 @@ func (s *Store[T, K]) Get(key T) (*K, error) {
 	s.m.RLock()
 	defer s.m.RUnlock()
 	if v, ok := s.list[key]; ok {
-		return &v, nil
+		return v, nil
 	}
 	return nil, ErrKeyNotFound
 }
@@ -60,10 +60,10 @@ func (s *Store[T, K]) Put(key T, value K) {
 	defer s.m.Unlock()
 	if len(s.next) == s.size {
 		delete(s.list, <-s.next)
-		s.list[key] = value
+		s.list[key] = &value
 		s.next <- key
 		return
 	}
-	s.list[key] = value
+	s.list[key] = &value
 	return
 }
