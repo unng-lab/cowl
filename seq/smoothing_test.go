@@ -68,15 +68,15 @@ func TestExpSmoothing_Next(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &ExpSmoothing{
-				before:       tt.fields.before,
+				Current:      tt.fields.before,
 				smoothFactor: tt.fields.smoothFactor,
 			}
 			var got time.Duration
 			if got = e.Next(tt.args.curDur); got != tt.want {
 				t.Errorf("Next() = %v, want %v", got, tt.want)
 			}
-			if e.before != got {
-				t.Errorf("Next() = %v, want %v", e.before, got)
+			if e.Current != got {
+				t.Errorf("Next() = %v, want %v", e.Current, got)
 			}
 		})
 	}

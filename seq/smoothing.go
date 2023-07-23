@@ -24,7 +24,7 @@ import (
 )
 
 type ExpSmoothing struct {
-	before       time.Duration
+	Current      time.Duration
 	smoothFactor float64
 }
 
@@ -33,13 +33,13 @@ func NewExpSmoothing(startDuration time.Duration, smoothFactor float64) *ExpSmoo
 		panic("smooth factor must be between 0 1")
 	}
 	return &ExpSmoothing{
-		before:       startDuration,
+		Current:      startDuration,
 		smoothFactor: smoothFactor,
 	}
 }
 
 func (e *ExpSmoothing) Next(curDur time.Duration) time.Duration {
-	e.before = time.Duration(int64(float64(curDur.Nanoseconds())*e.smoothFactor)) +
-		time.Duration(int64((1-e.smoothFactor)*float64(e.before.Nanoseconds())))
-	return e.before
+	e.Current = time.Duration(int64(float64(curDur.Nanoseconds())*e.smoothFactor)) +
+		time.Duration(int64((1-e.smoothFactor)*float64(e.Current.Nanoseconds())))
+	return e.Current
 }
